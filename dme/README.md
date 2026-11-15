@@ -26,6 +26,14 @@ key[64]). Leaving -> `0x09` (22 B). App traffic: client `0x02` broadcast /
 `[u16 source index][data]`. `0x2D` timebase query -> `0x2E` (echo, server ms).
 `0x1F` pings keep the client's 3 s timer alive.
 
+Aux UDP (in-match traffic): the JoinGame reply says ClientServerTCPAuxUDP, so
+the client connects with `0x15` instead of `0x00`. After `0x21` the server sends
+`0x18` (ip[16], u16 port); the client sends UDP `0x16` (world @0, index @0x1A,
+scert @0x1C), the server answers UDP `0x19` (u16 index, u32 scert, u16 count,
+ip[16], u16 port), the client sends `0x17` on TCP and gets `0x1A`. Afterwards
+frequent updates arrive on UDP and are relayed over UDP; reliable messages stay
+on TCP. `DME_AUX_UDP=0` (lobby) turns this off.
+
 ## Lobby side (medius_replies.py)
 
 - CreateGame `4/0x2F` -> `4/0x4F` {Status, WorldID} (the reply type matters:
@@ -47,5 +55,4 @@ TCP_NODELAY is set on lobby and DME connections.
 
 - The host's view in the level was a flat yellow screen (HUD drawn, world not)
   while the joiner rendered normally -- render-side, not network.
-- The auxiliary UDP channel is never requested so far (TCP carries everything).
 - Accounts are not per player yet (every login is account 1001).

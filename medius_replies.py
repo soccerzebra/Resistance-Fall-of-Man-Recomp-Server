@@ -140,7 +140,14 @@ NAT_PORT = 10070
 ACCOUNT_ID = 1001
 
 
-def net_connection_info(port=WORLD_PORT, host=PUBLIC_HOST_B, world_id=1):
+NET_TCP = 1             # NetConnectionTypeClientServerTCP
+NET_TCP_AUX_UDP = 3     # NetConnectionTypeClientServerTCPAuxUDP
+# The game server (DME) connection: TCP + the aux UDP channel for in-match
+# traffic. DME_AUX_UDP=0 falls back to TCP only.
+DME_CONN_TYPE = NET_TCP if os.environ.get('DME_AUX_UDP', '1') == '0' else NET_TCP_AUX_UDP
+
+
+def net_connection_info(port=WORLD_PORT, host=PUBLIC_HOST_B, world_id=1, conn_type=NET_TCP):
     """NetConnectionInfo, 0x9C bytes (deser func_00655DE4):
     u32 Type @0 | NetAddressList @4 (2 x raw 0x18 blob {u32 type, char[16], u32 port},
     BE: raw) | u32 WorldID @0x34 | ServerKey 16 x u32 @0x38 | SessionKey[17] @0x78 |
@@ -148,7 +155,7 @@ def net_connection_info(port=WORLD_PORT, host=PUBLIC_HOST_B, world_id=1):
     # Each NetAddress is read field by field (func_0065C6F4): u32 LE type,
     # char[16], u32 LE port -- little-endian, NOT a raw big-endian blob (v184).
     c = bytearray(0x9C)
-    _put(c, 0x00, struct.pack('<I', 1))                  # ClientServerTCP
+    _put(c, 0x00, struct.pack('<I', conn_type))
     a = bytearray(0x18)
     _put(a, 0x00, struct.pack('<I', 1))                  # NetAddressTypeExternal
     _put(a, 0x04, host)
@@ -531,7 +538,7 @@ def join_game(msgid, req):
             g['players'].append(_peer())
             if not g.get('reported'):
                 g['count'] = len(g['players'])
-    nci = net_connection_info(port=DME_PORT, world_id=world)
+    nci = net_connection_info(port=DME_PORT, world_id=world, conn_type=DME_CONN_TYPE)
     # Probe all three NetConnectionInfo-carrying replies at once; the client
     # completes the op with whichever one is the JoinGame response.
     pad = _hdr(msgid) + struct.pack('<iI', MEDIUS_SUCCESS, host_type) + nci
