@@ -17,7 +17,13 @@ cd "$(dirname "$0")"
 export MP_PUBLIC_HOST="${MP_PUBLIC_HOST:-r1.rfom.online}"
 export MEDIUS_RESPOND=1
 export SWEEP_PACED=reply_0x1F_e.bin
-PY="${PYTHON:-python3}"
+# Python 3.7+ is needed; Rocky 8's python3 is 3.6, so prefer a newer one.
+PY="${PYTHON:-}"
+if [ -z "$PY" ]; then
+  for p in python3.13 python3.12 python3.11 python3.10 python3.9 python3; do
+    command -v "$p" >/dev/null && { PY="$p"; break; }
+  done
+fi
 
 echo "Starting servers for clients connecting to $MP_PUBLIC_HOST ..."
 pids=()

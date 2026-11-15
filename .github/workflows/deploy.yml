@@ -1,0 +1,52 @@
+# Deploy to the r1.rfom.online VPS on every push to main (or by hand from the
+# Actions tab). Copies the code to /opt/rfom-server over SSH as the `rfom`
+# user and restarts the service. data/ on the server (TLS keys, stats, logs)
+# is never touched.
+#
+# Repository secrets (Settings -> Secrets and variables -> Actions):
+#   DEPLOY_HOST         the VPS address
+#   DEPLOY_SSH_KEY      private key whose public half is in ~rfom/.ssh/authorized_keys
+#   DEPLOY_KNOWN_HOSTS  the VPS's SSH host key line (pins the server)
+#
+# The rfom user may only run `sudo systemctl restart|is-active rfom-r1`, so a
+# change to deploy/rfom-r1.service has to be installed by hand as root.
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: SSH setup
+        env:
+          KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+          KNOWN: ${{ secrets.DEPLOY_KNOWN_HOSTS }}
+        run: |
+          mkdir -p ~/.ssh && chmod 700 ~/.ssh
+          printf '%s\n' "$KEY" > ~/.ssh/id_ed25519 && chmod 600 ~/.ssh/id_ed25519
+          printf '%s\n' "$KNOWN" > ~/.ssh/known_hosts
+
+      - name: Copy code
+        env:
+          HOST: ${{ secrets.DEPLOY_HOST }}
+        run: |
+          rsync -rlz --delete --chmod=D755,F644 \
+            --exclude '.git/' --exclude '.github/' --exclude 'data/' --exclude 'dev/' \
+            --exclude '__pycache__/' \
+            ./ "rfom@$HOST:/opt/rfom-server/"
+
+      - name: Restart
+        env:
+          HOST: ${{ secrets.DEPLOY_HOST }}
+        run: |
+          ssh "rfom@$HOST" 'sudo systemctl restart rfom-r1; sleep 5; sudo systemctl is-active rfom-r1'

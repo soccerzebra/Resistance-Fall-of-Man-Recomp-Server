@@ -8,7 +8,7 @@ Type=simple
 User=rfom
 WorkingDirectory=/opt/rfom-server
 Environment=MP_PUBLIC_HOST=r1.rfom.online
-ExecStart=/opt/rfom-server/start_servers.sh
+ExecStart=/bin/bash /opt/rfom-server/start_servers.sh
 Restart=always
 RestartSec=5
 
