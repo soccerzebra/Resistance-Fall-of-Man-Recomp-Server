@@ -55,7 +55,11 @@ IP changes. Forward TCP 10071–10080, 10443 and UDP 10079.
 
 `data\svo_tls_key.json` holds the server's private keys. Keep it private, and
 keep it (the clients' `svo_root.der` must match it); deleting it makes a new
-root that every client then needs again.
+root that every client then needs again. A change of address (IP) only
+reissues the server certificate under the same root.
+
+The public server's root is `svo_root.der` on r1.rfom.online
+(`/opt/rfom-server/data/svo_root.der`).
 
 ## Configuration
 

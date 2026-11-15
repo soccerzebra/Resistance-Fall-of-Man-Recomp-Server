@@ -199,10 +199,19 @@ def make_leaf(n, e, issuer, rn, rd, cn):
 
 
 def load_key():
-    if os.path.exists(KEYF):
-        k = json.load(open(KEYF))
-        if k.get('cn') == CN and k.get('root') and os.path.exists(ROOT_DER):
+    k = json.load(open(KEYF)) if os.path.exists(KEYF) else {}
+    if k.get('root') and os.path.exists(ROOT_DER):
+        if k.get('cn') == CN:
             return int(k['n'], 16), int(k['e']), int(k['d'], 16), bytes.fromhex(k['cert'])
+        if k.get('root_d'):
+            # The address changed: a new server certificate signed by the SAME
+            # root, so clients keep their svo_root.der.
+            log(f'certificate name is now {CN}: new 1024-bit server key, same root')
+            n, e, d = gen_rsa()
+            cert = make_leaf(n, e, ORIG_ISSUER, int(k['root_n'], 16), int(k['root_d'], 16), CN)
+            k.update(n=f'{n:x}', e=e, d=f'{d:x}', cn=CN, cert=cert.hex())
+            json.dump(k, open(KEYF, 'w'))
+            return n, e, d, cert
     while True:
         log('generating 2048-bit root key...')
         rn, re_, rd = gen_rsa(2048)
@@ -215,7 +224,7 @@ def load_key():
     cert = make_leaf(n, e, issuer, rn, rd, CN)
     open(ROOT_DER, 'wb').write(root)
     json.dump({'n': f'{n:x}', 'e': e, 'd': f'{d:x}', 'cn': CN, 'cert': cert.hex(),
-               'root': root.hex(), 'root_n': f'{rn:x}'}, open(KEYF, 'w'))
+               'root': root.hex(), 'root_n': f'{rn:x}', 'root_d': f'{rd:x}'}, open(KEYF, 'w'))
     log(f'wrote {ROOT_DER} ({len(root)} B): launch with PS3_MEMPATCH={ROOT_VA:08X}:<that path>')
     return n, e, d, cert
 
