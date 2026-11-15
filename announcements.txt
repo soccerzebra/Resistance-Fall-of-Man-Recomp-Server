@@ -1,0 +1,8 @@
+# Announcements shown in the online lobby (up to 5).
+# Separate announcements with a line that holds only ---
+# Lines starting with # are ignored. Read on every login, so edits apply
+# without restarting the servers.
+Welcome to the Resistance: Fall of Man community server!
+Custom games are up: host one from Custom Games, or search to join.
+---
+This server is a test build. Stats may be reset at any time.

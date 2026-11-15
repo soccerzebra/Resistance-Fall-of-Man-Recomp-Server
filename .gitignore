@@ -1,0 +1,5 @@
+# Runtime output: logs, saved stats, and the generated TLS keys.
+# data/svo_tls_key.json holds this server's PRIVATE keys -- never commit it.
+/data/
+__pycache__/
+*.pyc

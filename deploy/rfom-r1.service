@@ -1,0 +1,16 @@
+[Unit]
+Description=Resistance: Fall of Man community server (r1.rfom.online)
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=simple
+User=rfom
+WorkingDirectory=/opt/rfom-server
+Environment=MP_PUBLIC_HOST=r1.rfom.online
+ExecStart=/opt/rfom-server/start_servers.sh
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
