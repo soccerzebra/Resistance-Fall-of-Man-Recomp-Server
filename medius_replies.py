@@ -4,7 +4,7 @@ Wire: RT record 0x0A | u16 LE len | class u8 | id u8 | struct. The client's
 requests arrive as RT 0x0B with the same inner layout; the reply is routed to
 the pending request by its MessageID (21 bytes at the struct start), so every
 builder echoes the request's MessageID. Plain u32 fields are little-endian;
-ints inside raw blobs are big-endian (see v183 in docs/MULTIPLAYER-PLAN.md).
+ints inside raw blobs are big-endian.
 
 RULES maps (class, id) of a client request to a builder(msgid, req_struct)
 -> reply record. medius_server.py's responder mode (MEDIUS_RESPOND=1) uses it.

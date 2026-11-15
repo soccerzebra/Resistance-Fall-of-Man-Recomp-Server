@@ -14,7 +14,7 @@ exchanging state through the relay).
 | **DME game server**: connections, client indices, message relay | Sony servers | **`dme_server.py`** |
 | the match itself (game state, rules, the "session master") | **a player's PS3** | the game, unchanged (the creator, DME index 0) |
 
-## Protocol (read from the client's handlers; see docs/MULTIPLAYER-PLAN.md v185)
+## Protocol (read from the client's handlers)
 
 Standard SCE-RT record numbering. Handshake: client `0x24` HELLO -> server
 `0x22` CONNECT_REQUIRE + `0x25` HELLO(398); client `0x23` + `0x00`

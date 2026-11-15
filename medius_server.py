@@ -156,7 +156,7 @@ SWEEP_NEXT = [
              ] + ['reply_0x%02X_any.bin' % t for t in range(0x0B, 0x21)]
 
 # Records that must never be sent: their handlers kill the connection or the
-# title (each was observed aborting, not inferred -- see MULTIPLAYER-PLAN).
+# title (each was observed aborting, not inferred).
 SWEEP_SKIP_FILES = [
     'reply_0x2E_b.bin', 'reply_0x2C_b.bin', 'reply_0x14_b.bin', 'reply_0x13_b.bin',
     'reply_0x11_b.bin', 'reply_0x2A_s.bin', 'reply_0x19_s.bin', 'reply_0x1F_s.bin',

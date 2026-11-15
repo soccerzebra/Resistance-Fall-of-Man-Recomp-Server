@@ -4,7 +4,7 @@
 The DME is the SCE-RT relay every player of one game connects to (the match
 itself runs on the players' PS3s). The numbering of RT records matches the
 standard SCE-RT set, and every layout below was read from the client's own
-handler (rt_msg_client 3.98, handler table 0x62BF00; see MULTIPLAYER-PLAN v185):
+handler (rt_msg_client 3.98, handler table 0x62BF00):
 
   client -> server                        server -> client
   0x24 HELLO (cert)                       0x25 HELLO          u16 version 398

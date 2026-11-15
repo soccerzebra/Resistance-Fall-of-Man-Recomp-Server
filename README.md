@@ -74,9 +74,7 @@ The public server's root is `svo_root.der` on r1.rfom.online
 
 ## Protocol notes
 
-`dme/README.md` (DME handshake and relay) and the multiplayer plan in the
-client repo (`docs/MULTIPLAYER-PLAN.md`), which records how each message
-layout was read from the game's own (de)serializers.
+`dme/README.md` covers the DME handshake and relay.
 
 `replies/reply_0x03/04/05/07/22.bin` carry the game's public SCERT
 certificate (from the game binary, no private key); the client checks the
