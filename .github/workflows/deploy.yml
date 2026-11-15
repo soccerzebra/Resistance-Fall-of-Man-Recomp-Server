@@ -26,13 +26,18 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: SSH setup
         env:
+          HOST: ${{ secrets.DEPLOY_HOST }}
           KEY: ${{ secrets.DEPLOY_SSH_KEY }}
           KNOWN: ${{ secrets.DEPLOY_KNOWN_HOSTS }}
         run: |
+          for s in HOST:DEPLOY_HOST KEY:DEPLOY_SSH_KEY KNOWN:DEPLOY_KNOWN_HOSTS; do
+            v=${s%%:*}
+            [ -n "${!v}" ] || { echo "::error::repository secret ${s#*:} is not set"; exit 1; }
+          done
           mkdir -p ~/.ssh && chmod 700 ~/.ssh
           printf '%s\n' "$KEY" > ~/.ssh/id_ed25519 && chmod 600 ~/.ssh/id_ed25519
           printf '%s\n' "$KNOWN" > ~/.ssh/known_hosts
@@ -41,7 +46,7 @@ jobs:
         env:
           HOST: ${{ secrets.DEPLOY_HOST }}
         run: |
-          rsync -rlz --delete --chmod=D755,F644 \
+          rsync -rlz --delete --chmod=D755,F644 -e 'ssh -o BatchMode=yes -o StrictHostKeyChecking=yes' \
             --exclude '.git/' --exclude '.github/' --exclude 'data/' --exclude 'dev/' \
             --exclude '__pycache__/' \
             --exclude '/.ssh/' --exclude '/.bash*' --exclude '/.cache/' \
