@@ -83,3 +83,12 @@ server presents it.
 `dev/` holds the research tools used to work the protocol out (port taps,
 TLS probe, record builders, sweep drivers). They still assume the client
 repo's layout (`tools/mp/`, `logs/mp/`).
+
+## License
+
+The server code is released into the public domain under [The Unlicense](LICENSE):
+use, copy, modify and sell it however you like, no attribution needed.
+
+This does not cover the game's own SCERT certificate carried in
+`replies/reply_0x03/04/05/07/22.bin` (copied from the game binary), which is
+not ours to give away.
